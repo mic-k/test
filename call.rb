@@ -236,17 +236,26 @@ class Call
 
   # incident code -> description
   INCIDENTS = {
-    '1' => 'Health worker asked for bribe to admit the patient or treat the patient in hospital.',
-    '2' => 'The patient was asked to pay money after delivery.',
-    '3' => 'The patient was asked to pay for drugs, blood, tests, etc.',
-    '4' => 'The patient was asked to purchase drugs, gloves, soap etc from outside.',
-    '5' => 'The staff asked the patient to go to another hospital without a referral slip.',
-    '6' => 'The patient was asked a bribe for payments of JSY.',
-    '7' => 'The patient had to pay for the vehicle that brought them to hospital.',
-    '8' => 'The patient was asked to pay for or not provided with food during their stay in the JSSK hospitals.',
-    '9' => 'The patient were not provided with free drop back facility from JSSK hospitals.',
-    '0' => 'This is a situation which might result in death of the woman/child and no action is being taken by the staff.',
+  'a' => {description: 'emergency', audio_file: 'step3a'},
+  'b' => {description: 'emergency', audio_file: 'step3b'},
+  'c' => {description: 'emergency', audio_file: 'step3c'},
+  'd' => {description: 'emergency', audio_file: 'step3d'},
+  'e' => {description: 'emergency', audio_file: 'step3e'},
+  'f' => {description: 'emergency', audio_file: 'step3f'},
   }
+
+#  INCIDENTS = {
+#    '1' => 'Health worker asked for bribe to admit the patient or treat the patient in hospital.',
+#    '2' => 'The patient was asked to pay money after delivery.',
+#    '3' => 'The patient was asked to pay for drugs, blood, tests, etc.',
+#    '4' => 'The patient was asked to purchase drugs, gloves, soap etc from outside.',
+#    '5' => 'The staff asked the patient to go to another hospital without a referral slip.',
+#    '6' => 'The patient was asked a bribe for payments of JSY.',
+#    '7' => 'The patient had to pay for the vehicle that brought them to hospital.',
+#    '8' => 'The patient was asked to pay for or not provided with food during their stay in the JSSK hospitals.',
+#    '9' => 'The patient were not provided with free drop back facility from JSSK hospitals.',
+#    '0' => 'This is a situation which might result in death of the woman/child and no action is being taken by the staff.',
+#  }
 
   MONEY_CODES = {'2' => 'More_than_500', '1' => 'Less_than_500'}
 
@@ -336,15 +345,19 @@ class Call
     # after it ran successfully we have a @site instance variable with the chosen site
     get_site_info if $currentCall.isActive
 
-    # gets current incident code
-    # stores the incident action, or kicks out after several retries
-    get_incident_code_and_type! if $currentCall.isActive
+    
+     
+    
+    
+   # gets current incident code
+   # stores the incident action, or kicks out after several retries
+   get_incident_code_and_type! if $currentCall.isActive
 
-    # either asks for the amount of money
-    # or in emergency sends report to call the number
-    incident_action! if $currentCall.isActive
+#    # either asks for the amount of money
+#    # or in emergency sends report to call the number
+#    incident_action! if $currentCall.isActive
 
-    # report = build_report caller_info
+#    # report = build_report caller_info
   end
 
   
@@ -428,37 +441,45 @@ class Call
     kick_out_after_too_many_retries_for!(:get_incident_code_and_type)
 
     # options
-    prompts = isay('0008_Code') # ("step3")
+    prompts = isay('step3')
+    log('0#0#0##0#0#0#0#0#0#0#00# options 3')
+    log(prompts)
     say(prompts)
     
     
-    #emergency_situation  #TODO timeout = ?!
-      prompts = isay('0001_Code') # ('step3a')
-      options = @ask_default_options.merge(:choices => "0")
-      event = ask(prompts, options)
-      if envent.value == '0'
-        urgent_action
-      else
-        
-        #incident options step3 b,c,d,e
-        ['0002_Code', '0003_Code', '0004_Code', '0005_Code',].each do |message|
-          prompts = isay(message)
-          options = @ask_default_options.merge(:choices => "1,2")
-          event = ask(prompts, options)
-          
-          if envent.value == '1'
-            
-          else
-          
-          
-        
-        options = @ask_default_options.merge(:choices => '0,1,2,3,4,5,6,7,8,9')
+    #emergency_situation 3a #TODO timeout = ?!
+    prompts = isay('step3a')
+    options = @ask_default_options.merge(:choices => "0")
+    log('0#0#0##0#0#0#0#0#0#0#00# option 3a emergency')
+    log(prompts)
+    event = ask(prompts, options)
+    if event.value == '0'
+      urgent_action
+    else
+      
+      #incident options step3 b,c,d,e
+      'b'.upto('e').each do |x|
+        audio_file = INCIDENTS[x][:audio_file]
+        prompts = isay(audio_file)
+        options = @ask_default_options.merge(:choices => "1,2")
+        log('0#0#0##0#0#0#0#0#0#0#00# option 3#{x}')
+        log(INCIDENTS[x][:description])
+        log(prompts)
         event = ask(prompts, options)
-        store_incident_code(event)
-  
-  
-  
-  
+        
+        if event.value == '1'
+          store_incident_code(event)
+          incident_action!
+          
+          if add_complain == false
+            break
+          end
+        end
+      end
+    end    
+    # ask for more complains at the end of all options to restart   
+    more_complains
+    
   end
 
   # store the information of the caller
@@ -468,6 +489,19 @@ class Call
     caller_info['network'] = $currentCall.network
     caller_info['caller_name'] = $currentCall.callerName if $currentCall.callerName
     log( "Caller: " + caller_info['caller_number'] ) if DEBUG
+  end
+
+
+  def more_complains
+    add_complain = true
+    prompts = isay('press_3_add_more_complaints')
+    options = @ask_default_options.merge(:choices => "3,2")
+    log('0#0#0##0#0#0#0#0#0#0#00# add more complains?')
+    log(prompts)
+    event = ask(prompts, options)
+    if event.value == '2'
+      add_complain = false
+    end
   end
 
   # section 1.4 in the specs
@@ -546,10 +580,11 @@ class Call
   def incident_action!
     log("getting the right action for incident") if DEBUG
     case @incident['id']
-    when '0'
-      urgent_action
-    else
+    when 'b'..'e'
       money_demanded
+      more_complains
+    when 'f'
+      #nothing
     end
   end
 
@@ -558,7 +593,7 @@ class Call
     @incident ||= {}
     @incident['id'] = choice_event.value
     @incident['data'] = INCIDENTS[choice_event.value]
-    log("Incident is: #{@incident['id']}: #{@incident['data']}") if DEBUG
+    log("##############################Incident is: #{@incident['id']}: #{@incident['data']}") if DEBUG
   end
 
   # sends the collected data to ushahidi/crowdmap
@@ -576,7 +611,7 @@ class Call
     if money_description = MONEY_DESCRIPTION[@money_code]
       description << " #{money_description}"
     end
-    {
+    report = {
       :title => @incident['data'],
       :category => '1',
       :latitude => lat,
@@ -585,6 +620,9 @@ class Call
       :location_name => @site['data']['name']
 
     }
+    log('##############report')
+    log(report)
+    return report
   end
 
   # gives back the lat/lon coordinates of the hospital
