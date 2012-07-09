@@ -237,11 +237,11 @@ class Call
   # incident code -> description
   INCIDENTS = {
   'a' => {description: 'emergency', audio_file: 'step3a'},
-  'b' => {description: 'emergency', audio_file: 'step3b'},
-  'c' => {description: 'emergency', audio_file: 'step3c'},
-  'd' => {description: 'emergency', audio_file: 'step3d'},
-  'e' => {description: 'emergency', audio_file: 'step3e'},
-  'f' => {description: 'emergency', audio_file: 'step3f'},
+  'b' => {description: 'b. been asked to pay for medicines, examination, gloves, soap, etc.', audio_file: 'step3b'},
+  'c' => {description: 'c. been asked to pay for blood or operation', audio_file: 'step3c'},
+  'd' => {description: 'd. been sent to another hospital with a referral slip or an ambulance', audio_file: 'step3d'},
+  'e' => {description: 'e. been given free food and vehicle in the hospital covered under janani surakhsha scheme', audio_file: 'step3e'},
+  'f' => {description: 'f. been asked to pay during delivery or when you asked for the cheque of 1400 given under janani suraksha scheme', audio_file: 'step3f'},
   }
 
 #  INCIDENTS = {
@@ -449,7 +449,7 @@ class Call
     
     #emergency_situation 3a #TODO timeout = ?!
     prompts = isay('step3a')
-    options = @ask_default_options.merge(:choices => "0")
+    options = @ask_default_options.merge(:choices => "0,1")
     log('0#0#0##0#0#0#0#0#0#0#00# option 3a emergency')
     log(prompts)
     event = ask(prompts, options)
