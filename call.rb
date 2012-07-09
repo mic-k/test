@@ -445,7 +445,7 @@ class Call
     log('0#0#0##0#0#0#0#0#0#0#00# options 3')
     log(prompts)
     say(prompts)
-    
+    log('-----------before option 3a')
     
     #emergency_situation 3a #TODO timeout = ?!
     prompts = isay('step3a')
@@ -454,9 +454,11 @@ class Call
     log(prompts)
     event = ask(prompts, options)
     if event.value == '0'
+      log('-----------before urgent')
       urgent_action
+      log('-----------after urgent')
     else
-      
+      log('-----------else urgent')
       #incident options step3 b,c,d,e
       'b'.upto('e').each do |x|
         audio_file = INCIDENTS[x][:audio_file]
