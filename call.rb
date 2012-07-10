@@ -97,7 +97,7 @@ class UshahidiClient
   end
 
 end
-sfdkjksjj = shskhjsh
+
 
 
 ## module is for local testing only
@@ -315,6 +315,11 @@ class Call
 
  
   def initialize
+  
+  
+  sfdkjksjj = shskhjsh
+  
+  
     @maintainance_authorized = false
     @caller_info = {}
     @retries = {}
