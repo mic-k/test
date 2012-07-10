@@ -361,7 +361,9 @@ class Call
 #    # or in emergency sends report to call the number
 #    incident_action! if $currentCall.isActive
    byenow!
-   report = build_report caller_info
+   
+   
+   # report = build_report caller_info
   end
 
   
