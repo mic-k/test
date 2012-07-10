@@ -99,6 +99,7 @@ class UshahidiClient
 end
 
 
+
 ## module is for local testing only
 module LocalTesting
 
@@ -360,7 +361,9 @@ class Call
 #    # or in emergency sends report to call the number
 #    incident_action! if $currentCall.isActive
    byenow!
-   report = build_report caller_info
+   
+   
+   # report = build_report caller_info
   end
 
   
@@ -441,7 +444,7 @@ class Call
 
   # options step 3
   def options_3
-    prompts = isay('step3')
+    prompts = "http://hosting.tropo.com/104666/www/sayahog/audio/step3.wav"  # isay('step3')
     log!('0#0#0##0#0#0#0#0#0#0#00# options 3')
     log!(prompts)
     say(prompts)
