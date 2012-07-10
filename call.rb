@@ -121,8 +121,9 @@ module LocalTesting
     end
 
   end
-
-  $currentCall = CurrentCall.new
+  
+  ## next line is for local testing only
+  #$currentCall = CurrentCall.new
 
   class Event
 
@@ -217,7 +218,7 @@ end
 class Call
 
   ## next line is for local testing only
-  include LocalTesting
+  #include LocalTesting
 
 
   attr_accessor :caller_info
