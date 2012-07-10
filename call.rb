@@ -238,12 +238,12 @@ class Call
 
   # incident code -> description
   INCIDENTS = {
-  'a' => {:description => 'emergency', :audio_file => 'step3a'},
-  'b' => {:description => 'b. been asked to pay for medicines, examination, gloves, soap, etc.', :audio_file => 'step3b'},
-  'c' => {:description => 'c. been asked to pay for blood or operation', :audio_file => 'step3c'},
-  'd' => {:description => 'd. been sent to another hospital with a referral slip or an ambulance', :audio_file => 'step3d'},
-  'e' => {:description => 'e. been given free food and vehicle in the hospital covered under janani surakhsha scheme', :audio_file => 'step3e'},
-  'f' => {:description => 'f. been asked to pay during delivery or when you asked for the cheque of 1400 given under janani suraksha scheme', :audio_file => 'step3f'},
+  'a' => 'emergency',
+  'b' => 'b. been asked to pay for medicines, examination, gloves, soap, etc.', 
+  'c' => 'c. been asked to pay for blood or operation',
+  'd' => 'd. been sent to another hospital with a referral slip or an ambulance', 
+  'e' => 'e. been given free food and vehicle in the hospital covered under janani surakhsha scheme', 
+  'f' => 'f. been asked to pay during delivery or when you asked for the cheque of 1400 given under janani suraksha scheme', 
   }
 
 #  INCIDENTS = {
@@ -478,11 +478,11 @@ class Call
     #incident options step3 b,c,d,e
     ('b'..'f').each do |x|
       log!("----------############-----------------new incident")
-      audio_file = INCIDENTS[x][:audio_file]
+      audio_file = "step3#{x}"
       prompts = isay(audio_file)
       options = @ask_default_options.merge(:choices => "1,2")
       log!("0#0#0##0#0#0#0#0#0#0#00# option 3#{x}")
-      log(INCIDENTS[x][:description])
+      log(INCIDENTS[x])
       log!(prompts)
       event = ask(prompts, options)
       
@@ -612,7 +612,7 @@ class Call
     log("#{choice_event.inspect}")
     @incident ||= {}
     @incident['id'] = choice_event
-    @incident['data'] = INCIDENTS[choice_event][:description]
+    @incident['data'] = INCIDENTS[choice_event]
     log("##############################Incident is: #{@incident['id']}: #{@incident['data']}") if DEBUG
   end
 
