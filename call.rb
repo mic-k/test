@@ -97,7 +97,7 @@ class UshahidiClient
   end
 
 end
-fail
+sfdkjksjj = shskhjsh
 
 
 ## module is for local testing only
