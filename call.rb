@@ -27,6 +27,7 @@ USHAHIDI_CONFIG = {
   },
 }
 
+fail
 
 ## class to set up the gateway (Net::HTTP), method (POST) and user credentials for sending data to Ushahidi/Crowdmap
 class UshahidiGateway
