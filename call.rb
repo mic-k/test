@@ -122,7 +122,7 @@ module LocalTesting
 
   end
 
-  #$currentCall = CurrentCall.new
+  $currentCall = CurrentCall.new
 
   class Event
 
@@ -149,13 +149,15 @@ module LocalTesting
 
     @ask_count ||= 0
     @ask_count += 1
-
-    value = case @ask_count
-      when 1 then '8'
-      when 2 then '0023'
-      when 3 then '1'
-      when 4 then '2'
-      else '1'
+    puts "ask count: #{@ask_count}"
+    dialing = ['8','0023','1','1','1','1','1','3','1','1',
+               '1','3',   '1','1','1','2','1','1','1','3',
+               '1','1',   '1','3','1','1','1','3','1','1',
+               '1','3',   '1','1','1']
+    if dialing[@ask_count]
+      value = dialing[@ask_count]
+    else
+      value = '5'
     end
 
     puts "value is #{value}"
@@ -215,7 +217,7 @@ end
 class Call
 
   ## next line is for local testing only
-  #include LocalTesting
+  include LocalTesting
 
 
   attr_accessor :caller_info
@@ -356,8 +358,8 @@ class Call
 #    # either asks for the amount of money
 #    # or in emergency sends report to call the number
 #    incident_action! if $currentCall.isActive
-
-#    # report = build_report caller_info
+   byenow!
+   report = build_report caller_info
   end
 
   
@@ -436,51 +438,66 @@ class Call
     check_store_and_verify_site_or_retry(event)
   end
 
-  # ask user for the incident code
-  def get_incident_code_and_type!
-    kick_out_after_too_many_retries_for!(:get_incident_code_and_type)
-
-    # options
+  # options step 3
+  def options_3
     prompts = isay('step3')
-    log('0#0#0##0#0#0#0#0#0#0#00# options 3')
-    log(prompts)
+    log!('0#0#0##0#0#0#0#0#0#0#00# options 3')
+    log!(prompts)
     say(prompts)
     log('-----------before option 3a')
-    
-    #emergency_situation 3a #TODO timeout = ?!
+  end
+  
+  #emergency_situation 3a #TODO timeout = ?!
+  def option_3a_emergency  
     prompts = isay('step3a')
     options = @ask_default_options.merge(:choices => "0,1")
-    log('0#0#0##0#0#0#0#0#0#0#00# option 3a emergency')
-    log(prompts)
+    log!('0#0#0##0#0#0#0#0#0#0#00# option 3a emergency')
+    log!(prompts)
     event = ask(prompts, options)
     if event.value == '0'
-      log('-----------before urgent')
+      log!('-----------before urgent')
       urgent_action
-      log('-----------after urgent')
+      log!('-----------after urgent')
     else
-      log('-----------else urgent')
-      #incident options step3 b,c,d,e
-      'b'.upto('e').each do |x|
-        audio_file = INCIDENTS[x][:audio_file]
-        prompts = isay(audio_file)
-        options = @ask_default_options.merge(:choices => "1,2")
-        log('0#0#0##0#0#0#0#0#0#0#00# option 3#{x}')
-        log(INCIDENTS[x][:description])
-        log(prompts)
-        event = ask(prompts, options)
+      log!('-----------else urgent')
+    end
+  end
+
+  # ask user for the incident code
+  def get_incident_code_and_type!
+    log!("---------------------------new incident options")
+    @add_complain = true
+    kick_out_after_too_many_retries_for!(:get_incident_code_and_type)
+
+    # options step 3
+    options_3
+    
+    #emergency_situation 3a #TODO timeout = ?!
+    option_3a_emergency  
+      
+    #incident options step3 b,c,d,e
+    ('b'..'f').each do |x|
+      log!("----------############-----------------new incident")
+      audio_file = INCIDENTS[x][:audio_file]
+      prompts = isay(audio_file)
+      options = @ask_default_options.merge(:choices => "1,2")
+      log!("0#0#0##0#0#0#0#0#0#0#00# option 3#{x}")
+      log(INCIDENTS[x][:description])
+      log!(prompts)
+      event = ask(prompts, options)
+      
+      if event.value == '1'
+        store_incident_code(x)
+        incident_action!
         
-        if event.value == '1'
-          store_incident_code(event)
-          incident_action!
-          
-          if add_complain == false
-            break
-          end
+        if @add_complain == false
+          break
         end
       end
-    end    
+    end
+    
     # ask for more complains at the end of all options to restart   
-    more_complains
+    #more_complains
     
   end
 
@@ -495,14 +512,13 @@ class Call
 
 
   def more_complains
-    add_complain = true
     prompts = isay('press_3_add_more_complaints')
     options = @ask_default_options.merge(:choices => "3,2")
-    log('0#0#0##0#0#0#0#0#0#0#00# add more complains?')
-    log(prompts)
+    log!('0#0#0##0#0#0#0#0#0#0#00# add more complains?')
+    log!(prompts)
     event = ask(prompts, options)
     if event.value == '2'
-      add_complain = false
+      @add_complain = false
     end
   end
 
@@ -554,7 +570,7 @@ class Call
     log("User choose #{event.inspect}") if DEBUG
     if event.value == "1"
       log("User confirmed amount of money") if DEBUG
-      byenow!
+      #byenow!
     else
       log('User did not confirm money code. Redirecting back to choosing incident') if DEBUG
       reset_retry_counts
@@ -581,20 +597,22 @@ class Call
   # checks the dialed-in incident code, if '0' then urgent action is needed!
   def incident_action!
     log("getting the right action for incident") if DEBUG
+    log("0#0#0##0#0#0#0#0#0#0#00# case incident action: #{@incident['id']}")
     case @incident['id']
     when 'b'..'e'
       money_demanded
       more_complains
     when 'f'
-      #nothing
+      money_demanded
     end
   end
 
   # stores the incident code
   def store_incident_code(choice_event)
+    log("#{choice_event.inspect}")
     @incident ||= {}
-    @incident['id'] = choice_event.value
-    @incident['data'] = INCIDENTS[choice_event.value]
+    @incident['id'] = choice_event
+    @incident['data'] = INCIDENTS[choice_event][:description]
     log("##############################Incident is: #{@incident['id']}: #{@incident['data']}") if DEBUG
   end
 
@@ -644,6 +662,11 @@ class Call
     hangup
   end
 
+  def log!(what)
+    log(what) if DEBUG
+  end
+  
+
   # plays message when maintenance password is dialed in correctly
   def maintenance_authorized!
     @maintenance_authorized = true
@@ -652,10 +675,10 @@ class Call
 
   # counts the number of retries for every question(action), kicks caller out if more then 2 retries
   def kick_out_after_too_many_retries_for!(action)
-    @retries[action] ||= 0
-    invalid_choice if @retries[action] > 2
-    @retries[action] += 1
-    log("=========================== Count for action '#{action}': #{@retries[action]}") if DEBUG 
+#    @retries[action] ||= 0
+#    invalid_choice if @retries[action] > 2
+#    @retries[action] += 1
+#    log("=========================== Count for action '#{action}': #{@retries[action]}") if DEBUG 
   end
 
   # reset the retry counts
