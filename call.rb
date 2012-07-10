@@ -505,10 +505,6 @@ class Call
 
   # store the information of the caller
   def store_initial_caller_info
-    
-    
-    sfdkjksjj = shskhjsh
-    
     caller_info['caller_number'] = $currentCall.callerID
     caller_info['retries'] = 0
     caller_info['network'] = $currentCall.network
