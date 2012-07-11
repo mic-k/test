@@ -240,12 +240,12 @@ class Call
 
   # incident code -> description
   INCIDENTS = {
-  'a' => 'emergency',
-  'b' => 'b. been asked to pay for medicines, examination, gloves, soap, etc.', 
-  'c' => 'c. been asked to pay for blood or operation',
-  'd' => 'd. been sent to another hospital with a referral slip or an ambulance', 
-  'e' => 'e. been given free food and vehicle in the hospital covered under janani surakhsha scheme', 
-  'f' => 'f. been asked to pay during delivery or when you asked for the cheque of 1400 given under janani suraksha scheme', 
+  'a' => 'a: emergency',
+  'b' => 'b: been asked to pay for medicines, examination, gloves, soap, etc.', 
+  'c' => 'c: been asked to pay for blood or operation',
+  'd' => 'd: been sent to another hospital with a referral slip or an ambulance', 
+  'e' => 'e: been given free food and vehicle in the hospital covered under janani surakhsha scheme', 
+  'f' => 'f: been asked to pay during delivery or when you asked for the cheque of 1400 given under janani suraksha scheme', 
   }
 
 #  INCIDENTS = {
@@ -341,9 +341,9 @@ class Call
     # and contains all information about the current incomming call
 
     ## plays the "welcome" message
-    say(isay("0_1_Welcome_Message")) if $currentCall.isActive
+    # TODO say(isay("0_1_Welcome_Message")) if $currentCall.isActive
 
-    wait(100) if $currentCall.isActive
+    # TODO wait(100) if $currentCall.isActive
 
     # retries getting the site till successful, or kicks out the user after too many retries
     # after it ran successfully we have a @site instance variable with the chosen site
