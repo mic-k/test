@@ -444,7 +444,7 @@ class Call
 
   # options step 3
   def options_3
-    prompts = "http://hosting.tropo.com/104666/www/sayahog/audio/step3.wav"  # isay('step3')
+    prompts = isay('step3')
     log!('0#0#0##0#0#0#0#0#0#0#00# options 3')
     log!(prompts)
     say(prompts)
