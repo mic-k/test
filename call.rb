@@ -23,7 +23,7 @@ USHAHIDI_CONFIG = {
   :authentication => {
     :basic_auth => {
       :user => 'admin',
-      :password => 'admin' },
+      :password => 'admin########' },
   },
 }
 
@@ -269,7 +269,7 @@ class Call
   # site number (key): site, location, phone
   # these sites are in the Azamgar District
   SITES = {
-    '0001' => {'name'=>'Azamgarh Sadar Mahila Hospital', 'location'=>'26.063777,83.183628', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
+    '0001' => {'name'=>'TESTING!!', 'location'=>'25.0,82.0', 'phone'=>'+919', 'district' => 'TESTING!!'} #{'name'=>'Azamgarh Sadar Mahila Hospital', 'location'=>'26.063777,83.183628', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
     '0002' => {'name'=>'Phoolpur', 'location'=>'26.044017,82.520839', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
     '0003' => {'name'=>'Lalganj', 'location'=>'25.450143,82.59002', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
     '0004' => {'name'=>'Atraulia', 'location'=>'26.10495,82.541362', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
