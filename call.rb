@@ -23,7 +23,7 @@ USHAHIDI_CONFIG = {
   :authentication => {
     :basic_auth => {
       :user => 'admin',
-      :password => 'admin' },
+      :password => 'admin########' },
   },
 }
 
@@ -269,7 +269,7 @@ class Call
   # site number (key): site, location, phone
   # these sites are in the Azamgar District
   SITES = {
-    '0001' => {'name'=>'Azamgarh Sadar Mahila Hospital', 'location'=>'26.063777,83.183628', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
+    '0001' => {'name'=>'TESTING!!', 'location'=>'25.0,82.0', 'phone'=>'+919', 'district' => 'TESTING!!'}, #{'name'=>'Azamgarh Sadar Mahila Hospital', 'location'=>'26.063777,83.183628', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
     '0002' => {'name'=>'Phoolpur', 'location'=>'26.044017,82.520839', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
     '0003' => {'name'=>'Lalganj', 'location'=>'25.450143,82.59002', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
     '0004' => {'name'=>'Atraulia', 'location'=>'26.10495,82.541362', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
@@ -309,7 +309,8 @@ class Call
     '0037' => {'name'=>'Ahiraura', 'location'=>'25.038327,82.998962', 'phone'=>'+919450074037', 'district' => 'Mirazpur_Zila_District'},
     '0038' => {'name'=>'Sikhar', 'location'=>'25.074132,82.485834', 'phone'=>'+919450074037', 'district' => 'Mirazpur_Zila_District'},
     '0039' => {'name'=>'Vindhyachal', 'location'=>'25.095163,82.302222', 'phone'=>'+919450074037', 'district' => 'Mirazpur_Zila_District'},
-    '0040' => {'name'=>'Narayanpur', 'location'=>'25.204941,83.020935', 'phone'=>'+919450074037', 'district' => 'Mirazpur_Zila_District'}
+    '0040' => {'name'=>'Narayanpur', 'location'=>'25.204941,83.020935', 'phone'=>'+919450074037', 'district' => 'Mirazpur_Zila_District'},
+    '9999' => {'name'=>'TESTING!!', 'location'=>'25.0,82.0', 'phone'=>'+919', 'district' => 'TESTING!!'},
   }
   # end decoder ring
 
@@ -318,6 +319,7 @@ class Call
     @maintainance_authorized = false
     @caller_info = {}
     @retries = {}
+    @report_list = []
     @ask_default_options = {
       :mode => 'dtmf',
       :bargein => true,
@@ -493,7 +495,7 @@ class Call
       if event.value == '1'
         store_incident_code(x)
         incident_action!
-        
+        @report_list << report
         if @add_complain == false
           break
         end
@@ -621,7 +623,7 @@ class Call
   end
 
   # sends the collected data to ushahidi/crowdmap
-  def capture_data!
+  def capture_data!(report)
     client = UshahidiClient.new
     log("about to post report #{report} using #{client}") if DEBUG
     res = client.post_report(report)
@@ -657,7 +659,11 @@ class Call
   # plays end message if all data was sucsessful collected, captures data and hangs up the call
   def byenow!
     say(isay("step6"))
-    capture_data!
+    
+    @report_list.each do |item|
+      capture_data!(item)
+    end
+    
     hangup!
   end
 
