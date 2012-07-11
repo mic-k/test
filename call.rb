@@ -309,7 +309,8 @@ class Call
     '0037' => {'name'=>'Ahiraura', 'location'=>'25.038327,82.998962', 'phone'=>'+919450074037', 'district' => 'Mirazpur_Zila_District'},
     '0038' => {'name'=>'Sikhar', 'location'=>'25.074132,82.485834', 'phone'=>'+919450074037', 'district' => 'Mirazpur_Zila_District'},
     '0039' => {'name'=>'Vindhyachal', 'location'=>'25.095163,82.302222', 'phone'=>'+919450074037', 'district' => 'Mirazpur_Zila_District'},
-    '0040' => {'name'=>'Narayanpur', 'location'=>'25.204941,83.020935', 'phone'=>'+919450074037', 'district' => 'Mirazpur_Zila_District'}
+    '0040' => {'name'=>'Narayanpur', 'location'=>'25.204941,83.020935', 'phone'=>'+919450074037', 'district' => 'Mirazpur_Zila_District'},
+    '9999' => {'name'=>'TESTING!!', 'location'=>'25.0,82.0', 'phone'=>'+919', 'district' => 'TESTING!!'},
   }
   # end decoder ring
 
