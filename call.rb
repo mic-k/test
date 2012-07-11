@@ -341,9 +341,9 @@ class Call
     # and contains all information about the current incomming call
 
     ## plays the "welcome" message
-    say(isay("0_1_Welcome_Message")) if $currentCall.isActive
+    #say(isay("step1")) if $currentCall.isActive
 
-    wait(100) if $currentCall.isActive
+    #wait(100) if $currentCall.isActive
 
     # retries getting the site till successful, or kicks out the user after too many retries
     # after it ran successfully we have a @site instance variable with the chosen site
@@ -435,7 +435,7 @@ class Call
 
     kick_out_after_too_many_retries_for!(:get_site_info)
 
-    question = isay("1_1_Enter_4_digit_code_number")
+    question = isay("step1")
     
     options = @ask_default_options.merge(:choices => "[4-DIGITS]")
     event = ask(question, options)
@@ -516,7 +516,7 @@ class Call
 
 
   def more_complains
-    prompts = isay('press_3_add_more_complaints')
+    prompts = isay('step5')
     options = @ask_default_options.merge(:choices => "3,2")
     log!('0#0#0##0#0#0#0#0#0#0#00# add more complains?')
     log!(prompts)
@@ -539,7 +539,7 @@ class Call
 
     kick_out_after_too_many_retries_for!(:money_demanded)
 
-    question = isay("3_1_a__if_spent_less_that_500_or_more_than_500")
+    question = isay("step4")
     options = @ask_default_options.merge(:choices => "1,2")
     event = ask(question, options)
     store_and_confirm_money_code(event)
@@ -656,7 +656,7 @@ class Call
 
   # plays end message if all data was sucsessful collected, captures data and hangs up the call
   def byenow!
-    say(isay("0_2_End_Message_1_Thank_You"))
+    say(isay("step6"))
     capture_data!
     hangup!
   end
