@@ -3,13 +3,15 @@
 ## proudly presented by adap:to
 ## devolute.org
 
-require 'net/http'
+#require 'net/http'
+require 'net/https'
+
 
 ENV['TZ'] = 'IST'
 
 
 ## configuration for the Ushahidi Crowdmap
-USHAHIDI_CONFIG = {
+ushahidi_config1 = {
   :url => 'meraswasthyameriaawaz.org/api',
   :parameters => {
     :required => { },
@@ -22,10 +24,30 @@ USHAHIDI_CONFIG = {
   },
   :authentication => {
     :basic_auth => {
-      :user => 'admin',
-      :password => 'admin########' },
+      :user => 'adm4in',
+      :password => 'ad3min' },
   },
 }
+
+ushahidi_config2 = {
+  :url => 'apitest.crowdmap.com/api',
+  :parameters => {
+    :required => { },
+    :optional => {
+      :task => 'task',
+      :by => 'by',
+      :action => 'action',
+      :incident_id => 'incident_id'
+    },
+  },
+  :authentication => {
+    :basic_auth => {
+      :user => 'abc123',
+      :password => 'asdfg' },
+  },
+}
+
+USHAHIDI_CONFIG = ushahidi_config2
 
 
 ## class to set up the gateway (Net::HTTP), method (POST) and user credentials for sending data to Ushahidi/Crowdmap
@@ -33,7 +55,7 @@ class UshahidiGateway
 
   attr_reader :user, :password
 
-  def initialize(credentials)
+  def initialize(credentials={})
     @user = credentials[:user]
     @password = credentials[:password]
   end
@@ -43,10 +65,33 @@ class UshahidiGateway
   end
 
   def post url, payload
-    response = Net::HTTP.post_form(URI.parse("http://#{user}:#{password}@" + url), payload )
+    #response = Net::HTTP.post_form(URI.parse("http://#{user}:#{password}@" + url), payload )
+    #return response.body
+    
+    
+    
+    puts "|||||||||||||||||||||||||||||<<|"
+    puts uri = URI.parse(url)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+    #puts URI.parse("http://#{user}:#{password}@" + uri)
+    # get_response_with_redirect(URI.parse("http://#{user}:#{password}@" + url))
+    puts payload
+    
+#    puts request = Net::HTTP::Post.new(uri.request_uri, payload)
+#    puts http.request(request)
+#    puts uri.inspect
+#    puts uri.request_uri
+    puts "post_form:"
+    puts response = http.post(uri, payload )
+        
+    puts response.header['location'].inspect
     response.body
   end
 
+  
 end
 
 ## class to set up the incident data (payload) for sending it to Crowdmap
@@ -56,7 +101,7 @@ class UshahidiClient
 
   def initialize
     @config = USHAHIDI_CONFIG
-    @gateway = UshahidiGateway.new( config[:authentication][:basic_auth] )
+    @gateway = UshahidiGateway.new #( config[:authentication][:basic_auth] )
     @url = config[:url]
   end
 
@@ -72,7 +117,7 @@ class UshahidiClient
       :task => 'report',
       :incident_title => report[:title],
       :incident_description => report[:description],
-      :incident_category => report[:category],
+      :incident_category => '0',#'report[:category],
       :incident_date => get_date_and_time[:date],
       :incident_hour => get_date_and_time[:hours],
       :incident_minute => get_date_and_time[:minutes],
@@ -94,6 +139,10 @@ class UshahidiClient
     time_hash[:minutes]= t.strftime("%M")
     time_hash[:date]= t.strftime("%m/%d/%Y")
     time_hash
+  end
+
+  def log(what)
+    puts "logged: #{what}}"
   end
 
 end
@@ -124,7 +173,7 @@ module LocalTesting
   end
   
   ## next line is for local testing only
-  #$currentCall = CurrentCall.new
+  $currentCall = CurrentCall.new
 
   class Event
 
@@ -152,8 +201,8 @@ module LocalTesting
     @ask_count ||= 0
     @ask_count += 1
     puts "ask count: #{@ask_count}"
-    dialing = ['8','0023','1','1','1','1','1','3','1','1',
-               '1','3',   '1','1','1','2','1','1','1','3',
+    dialing = ['8','0001','1','1','2','1','1','1','3','1','1',
+               '1','2',   '1','1','1','2','1','1','1','3',
                '1','1',   '1','3','1','1','1','3','1','1',
                '1','3',   '1','1','1']
     if dialing[@ask_count]
@@ -162,7 +211,7 @@ module LocalTesting
       value = '5'
     end
 
-    puts "value is #{value}"
+    puts "###VALUE IS #{value}"
 
     event = Event.new(value)
 
@@ -219,7 +268,7 @@ end
 class Call
 
   ## next line is for local testing only
-  #include LocalTesting
+  include LocalTesting
 
 
   attr_accessor :caller_info
@@ -269,7 +318,7 @@ class Call
   # site number (key): site, location, phone
   # these sites are in the Azamgar District
   SITES = {
-    '0001' => {'name'=>'TESTING!!', 'location'=>'25.0,82.0', 'phone'=>'+919', 'district' => 'TESTING!!'}, #{'name'=>'Azamgarh Sadar Mahila Hospital', 'location'=>'26.063777,83.183628', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
+    '0001' => {'name'=>'TESTING!!_' + rand(1000).to_s, 'location'=>'11,11', 'phone'=>'+919', 'district' => 'TESTING!!' + rand(1000).to_s}, #{'name'=>'Azamgarh Sadar Mahila Hospital', 'location'=>'26.063777,83.183628', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
     '0002' => {'name'=>'Phoolpur', 'location'=>'26.044017,82.520839', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
     '0003' => {'name'=>'Lalganj', 'location'=>'25.450143,82.59002', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
     '0004' => {'name'=>'Atraulia', 'location'=>'26.10495,82.541362', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
@@ -456,7 +505,7 @@ class Call
   #emergency_situation 3a #TODO timeout = ?!
   def option_3a_emergency  
     prompts = isay('step3a')
-    options = @ask_default_options.merge(:choices => "0,1")
+    options = @ask_default_options.merge(:choices => "0,1", :timeout => 120.0, :attempts => 3)
     log!('0#0#0##0#0#0#0#0#0#0#00# option 3a emergency')
     log!(prompts)
     event = ask(prompts, options)
@@ -659,8 +708,10 @@ class Call
   # plays end message if all data was sucsessful collected, captures data and hangs up the call
   def byenow!
     say(isay("step6"))
-    
+    log!("----###------REPORT_LIST: #{@report_list}")
     @report_list.each do |item|
+      log!("ITEM:")
+      log!(item.inspect)
       capture_data!(item)
     end
     
