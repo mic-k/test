@@ -647,7 +647,7 @@ class Call
     end
     report = {
       :title => @incident['data'],
-      :category => '1',
+      :category => '12',
       :latitude => lat,
       :longitude => lon,
       :description => description,
