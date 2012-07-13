@@ -450,12 +450,13 @@ class Call
     log!(prompts)
     say(prompts)
     log('-----------before option 3a')
+    wait(300)
   end
   
   #emergency_situation 3a #TODO timeout = ?!
   def option_3a_emergency  
     prompts = isay('step3a')
-    options = @ask_default_options.merge(:choices => "0,1")
+    options = @ask_default_options.merge(:choices => "0,1", :timeout => 10.0, :attempts => 1)
     log!('0#0#0##0#0#0#0#0#0#0#00# option 3a emergency')
     log!(prompts)
     event = ask(prompts, options)
