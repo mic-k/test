@@ -488,6 +488,7 @@ class Call
       
     #incident options step3 b,c,d,e
     ('b'..'f').each do |x|
+      money_redo = false
       log!("----------############-----------------new incident")
       audio_file = "step3#{x}"
       prompts = isay(audio_file)
@@ -500,6 +501,7 @@ class Call
       if event.value == '1'
         store_incident_code(x)
         incident_action!
+        redo if money_redo == true
         @report_list << report
         if @add_complain == false
           break
@@ -586,7 +588,8 @@ class Call
       log('User did not confirm money code. Redirecting back to choosing incident') if DEBUG
       reset_retry_counts
       # send back to choose incident code
-      get_incident_code_and_type!
+      #get_incident_code_and_type!
+      money_redo = true
     end
   end
 
