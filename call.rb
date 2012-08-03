@@ -244,13 +244,23 @@ class Call
 
   # incident code -> description
   INCIDENTS = {
-  'a' => 'emergency',
-  'b' => 'b. been asked to pay for medicines, examination, gloves, soap, etc.', 
-  'c' => 'c. been asked to pay for blood or operation',
-  'd' => 'd. been sent to another hospital with a referral slip or an ambulance', 
-  'e' => 'e. been given free food and vehicle in the hospital covered under janani surakhsha scheme', 
-  'f' => 'f. been asked to pay during delivery or when you asked for the cheque of 1400 given under janani suraksha scheme', 
+  'a' => 'emergency call forwarding',
+  'b' => 'Money asked for medicines, examination, gloves, soap, etc.', 
+  'c' => 'Money asked for blood or operation',
+  'd' => 'Money asked for ambulance service', 
+  'e' => 'Money asked for food and vehicle in the hospital covered under janani surakhsha scheme', 
+  'f' => 'Money asked during delivery or when you asked for the cheque of 1400 given under janani suraksha scheme', 
   }
+
+  # for auto-categorization in the map
+  INCIDENT_CATEGORY_NUMBERS = {
+  'b' => '13', 
+  'c' => '14',
+  'd' => '15', 
+  'e' => '16', 
+  'f' => '17'
+  }
+
 
 #  INCIDENTS = {
 #    '1' => 'Health worker asked for bribe to admit the patient or treat the patient in hospital.',
@@ -273,7 +283,7 @@ class Call
   # site number (key): site, location, phone
   # these sites are in the Azamgar District
   SITES = {
-    '0001' => {'name'=>'TESTING!!_' + rand(1000).to_s, 'location'=>'11,11', 'phone'=>'+919', 'district' => 'TESTING!!' + rand(1000).to_s}, #{'name'=>'Azamgarh Sadar Mahila Hospital', 'location'=>'26.063777,83.183628', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
+    '0001' => {'name'=>'Azamgarh Sadar Mahila Hospital', 'location'=>'26.063777,83.183628', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
     '0002' => {'name'=>'Phoolpur', 'location'=>'26.044017,82.520839', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
     '0003' => {'name'=>'Lalganj', 'location'=>'25.450143,82.59002', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
     '0004' => {'name'=>'Atraulia', 'location'=>'26.10495,82.541362', 'phone'=>'+919473826492', 'district' => 'Azamgarh_Zila_District'},
@@ -314,8 +324,7 @@ class Call
     '0038' => {'name'=>'Sikhar', 'location'=>'25.074132,82.485834', 'phone'=>'+919450074037', 'district' => 'Mirazpur_Zila_District'},
     '0039' => {'name'=>'Vindhyachal', 'location'=>'25.095163,82.302222', 'phone'=>'+919450074037', 'district' => 'Mirazpur_Zila_District'},
     '0040' => {'name'=>'Narayanpur', 'location'=>'25.204941,83.020935', 'phone'=>'+919450074037', 'district' => 'Mirazpur_Zila_District'},
-    '9999' => {'name'=>'TESTING!!', 'location'=>'25.0,82.0', 'phone'=>'+919', 'district' => 'TESTING!!'},
-  }
+    }
   # end decoder ring
 
  
@@ -461,7 +470,7 @@ class Call
   #emergency_situation 3a #TODO timeout = ?!
   def option_3a_emergency  
     prompts = isay('step3a')
-    options = @ask_default_options.merge(:choices => "0,1", :timeout => 10.0, :attempts => 1)
+    options = @ask_default_options.merge(:choices => "0,1", :timeout => 6.0, :attempts => 1)
     log!('0#0#0##0#0#0#0#0#0#0#00# option 3a emergency')
     log!(prompts)
     event = ask(prompts, options)
@@ -497,7 +506,6 @@ class Call
       log(INCIDENTS[x])
       log!(prompts)
       event = ask(prompts, options)
-      
       if event.value == '1'
         store_incident_code(x)
         incident_action!
@@ -506,6 +514,8 @@ class Call
         if @add_complain == false
           break
         end
+      else
+        wait(600)
       end
     end
     
@@ -647,7 +657,7 @@ class Call
     end
     report = {
       :title => @incident['data'],
-      :category => '12',
+      :category => INCIDENT_CATEGORY_NUMBERS[@incident['id']],
       :latitude => lat,
       :longitude => lon,
       :description => description,
